@@ -2,39 +2,29 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"cloud.google.com/go/compute/metadata"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-
-	// [START setting_port]
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s\n", port)
-	}
-
-	// let's check app engine instance scopes
-	scopes, _ := metadata.Get("instance/service-accounts/default/scopes")
-	log.Printf("[DEBUG] metadata scopes: %s.\n", scopes)
-
-	log.Printf("Listening on port %s", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-	// [END setting_port]
+	appengine.Main()
 }
 
 // indexHandler responds to requests with our greeting.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
+	ctx := appengine.NewContext(r)
+
+	// let's check app engine instance scopes
+	scopes, _ := metadata.Get("instance/service-accounts/default/scopes")
+	log.Infof(ctx, "[DEBUG] metadata scopes: %s.\n", scopes)
+
 	client, _ := google.DefaultClient(ctx, "https://www.googleapis.com/auth/spreadsheets.readonly")
 	srv, err := sheets.New(client)
 
@@ -44,7 +34,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	readRange := "Class Data!A2:E"
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve data from sheet: %v\n", err)
+		msg := fmt.Sprintf("Unable to retrieve data from sheet: %v\n", err)
+		log.Errorf(ctx, msg)
+		panic(msg)
 	}
 
 	if len(resp.Values) == 0 {
