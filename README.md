@@ -2,6 +2,8 @@
 
 The repository created to demonstrate the issue with access to google spreadsheet API from Google App Engine.
 
+Stack Overflow question: https://stackoverflow.com/questions/53733022/google-app-engine-go-1-11-application-can-not-access-google-spreadsheets
+
 ## problem statement
 
 I'm trying to access google spreadsheet via API from the application running on [Google App Engine Go 1.11 Standard Environment](https://cloud.google.com/appengine/docs/standard/go111/).
