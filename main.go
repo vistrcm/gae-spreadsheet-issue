@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"cloud.google.com/go/compute/metadata"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
 )
@@ -21,6 +22,10 @@ func main() {
 		port = "8080"
 		log.Printf("Defaulting to port %s", port)
 	}
+
+	// let's check app engine instance scopes
+	scopes, _ := metadata.Get("instance/service-accounts/default/scopes")
+	log.Printf("[DEBUG] metadata scopes: %s.\n", scopes)
 
 	log.Printf("Listening on port %s", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
