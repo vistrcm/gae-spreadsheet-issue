@@ -20,7 +20,7 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("Defaulting to port %s", port)
+		log.Printf("Defaulting to port %s\n", port)
 	}
 
 	// let's check app engine instance scopes
@@ -44,13 +44,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	readRange := "Class Data!A2:E"
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve data from sheet: %v", err)
+		log.Fatalf("Unable to retrieve data from sheet: %v\n", err)
 	}
 
 	if len(resp.Values) == 0 {
-		fmt.Println("No data found.")
+		fmt.Fprintf(w, "No data found.\n")
 	} else {
-		fmt.Println("Name, Major:")
+		fmt.Fprintf(w, "Name, Major:\n")
 		for _, row := range resp.Values {
 			// Print columns A and E, which correspond to indices 0 and 4.
 			fmt.Fprintf(w, "%s, %s\n", row[0], row[4])
